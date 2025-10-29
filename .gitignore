@@ -1,4 +1,4 @@
-.DS_Strore
+.DS_Store
 venv/
 data/
 notebooks/text2SQL.ipynb
