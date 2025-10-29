@@ -20,13 +20,15 @@ def load_llm():
     The pipeline will be reused across classifier / parameter extractor / answer generator.
     """
 
+    print("DEBUG HF_TOKEN present:", HF_TOKEN is not None)
+
     if torch.backends.mps.is_available():
         # On Apple Silicon, MPS = Metal Performance Shaders (Apple GPU backend)
         Device_map = "mps"
-        Torch_dtype = torch.bfloat16  # bfloat16 works better than float16 on MPS
+        dtype = torch.bfloat16  # bfloat16 works better than float16 on MPS
     else:
         Device_map = "cpu"
-        Torch_dtype = torch.float32   # safe default on CPU
+        dtype = torch.float32   # safe default on CPU
 
     # Load model configuration
     model_config = transformers.AutoConfig.from_pretrained(
@@ -56,7 +58,7 @@ def load_llm():
         #device_map="auto",        # automatically put layers on GPU if available
         #load_in_8bit=True, 
         device_map=Device_map,     # "mps" on Apple GPU, otherwise "cpu"
-        torch_dtype=Torch_dtype,   # lowers memory usage a bit on MPS
+        dtype=dtype,   # lowers memory usage a bit on MPS
         #quantization_config=bnb_config,
         token=HF_TOKEN
     )
