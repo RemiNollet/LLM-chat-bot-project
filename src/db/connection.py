@@ -2,6 +2,9 @@
 This module centralizes the SQLite connection logic.
 If we later switch to Postgres or an API microservice, we only change here.
 Database can be dowloaded at: https://blent-learning-user-ressources.s3.eu-west-3.amazonaws.com/projects/e23c6b/data/orders.db
+
+mkdir data && cd data
+curl -O https://blent-learning-user-ressources.s3.eu-west-3.amazonaws.com/projects/e23c6b/data/orders.db
 """
 
 import sqlite3
