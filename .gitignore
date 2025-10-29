@@ -2,3 +2,4 @@
 venv/
 data/
 notebooks/text2SQL.ipynb
+.env
