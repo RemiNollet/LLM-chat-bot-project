@@ -3,3 +3,4 @@ venv/
 data/
 notebooks/text2SQL.ipynb
 .env
+*__pycache__*
