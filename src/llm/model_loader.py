@@ -12,7 +12,7 @@ import torch
 from config import MODEL_ID, HF_TOKEN, MAX_NEW_TOKENS
 
 
-def load_llm():
+def load_llm(logger):
     """
     Load the Mistral model in 8-bit precision. + tokenizer as a text-generation pipeline.
     Returns a Hugging Face transformers pipeline object.
@@ -21,6 +21,8 @@ def load_llm():
     """
 
     print("DEBUG HF_TOKEN present:", HF_TOKEN is not None)
+    logger.info("Dont forget to install database following instructions in src/db/connection.py !!")
+    logger.info("Dont forget to create .env file with your HF_TOKEN !!")
 
     if torch.backends.mps.is_available():
         # On Apple Silicon, MPS = Metal Performance Shaders (Apple GPU backend)
@@ -63,6 +65,14 @@ def load_llm():
         token=HF_TOKEN
     )
 
+    # Apple-friendly settings
+    model.generation_config.use_cache = False
+    try:
+        model.config.attn_implementation = "eager"
+    except Exception:
+        pass
+    model.eval()
+
 
     # Build the generation pipeline
     pipe = transformers.pipeline(
@@ -70,8 +80,12 @@ def load_llm():
         model=model,
         tokenizer=tokenizer,
         max_new_tokens=MAX_NEW_TOKENS,
+        return_full_text=False,
         temperature=0.2,    # low temperature = more deterministic
         do_sample=False     # no sampling = stable, predictable output
     )
+    pipe.SMALL_KW = dict(max_new_tokens=8,  do_sample=False, use_cache=False)
+    pipe.MED_KW   = dict(max_new_tokens=32, do_sample=False, use_cache=False)
+    pipe.LONG_KW  = dict(max_new_tokens=96, do_sample=False, use_cache=False)
 
     return pipe

@@ -48,10 +48,7 @@ logging.basicConfig(
     datefmt="%H:%M:%S"
 )
 logger = logging.getLogger(__name__)
-
-logging.info("Dont forget to install database following instructions in src/db/connection.py !!")
-logging.info("Dont forget to create .env file with your HF_TOKEN !!")
-
+ 
 # -------------------------
 # Simulated authenticated user context
 # -------------------------
@@ -68,7 +65,7 @@ def get_pipeline():
     Cache the LLM pipeline so we don't reload the model for every request.
     Streamlit will keep this in memory between interactions.
     """
-    pipe = load_llm()
+    pipe = load_llm(logger)
     logger.info("Model loaded successfully.")
     return pipe
 
@@ -80,7 +77,7 @@ def handle_user_message(user_message: str) -> str:
     returns the final assistant response string.
     """
     logger.info("------------------------------------------------------------")
-    logger.info(f"🧍 User message: {user_message}")
+    logger.info(f"User message: {user_message}")
 
     # Step 1: sanitize input
     clean_message = sanitize_user_input(user_message)
@@ -115,6 +112,7 @@ def handle_user_message(user_message: str) -> str:
 
     # Step 4: fetch recent orders for this user
     recent_orders = fetch_orders_for_user(user_id)
+    logger.info("recent orders found: %s", recent_orders)
     logger.info(f"Found {len(recent_orders)} recent orders for user {user_id}.")
 
     # Step 5: extract which order the user is talking about
@@ -144,6 +142,7 @@ def handle_user_message(user_message: str) -> str:
     logger.info("Generating final LLM answer...")
     final_answer = generate_final_answer(
         pipe=pipe,
+        user_message=user_message,
         first_name=first_name,
         intent=intent,
         order_info=order_info,
@@ -180,7 +179,7 @@ for role, msg in st.session_state["chat_history"]:
     if role == "user":
         st.markdown(f"**You:** {msg}")
     else:
-        st.markdown(f"**Assistant:** {msg}")
+        st.markdown(f"**Assistant:** {msg.split('<')[0]}")
 
 # User input box
 user_input = st.text_input(
@@ -199,4 +198,4 @@ if st.button("Send") and user_input:
     st.session_state["chat_history"].append(("assistant", bot_reply))
 
     # Rerender
-    st.experimental_rerun()
+    st.rerun()

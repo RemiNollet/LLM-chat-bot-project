@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ID of the LLM you want to use from Hugging Face
-# MODEL_ID = "mistralai/Mistral-7B-Instruct-v0.3"
+#MODEL_ID = "mistralai/Mistral-7B-Instruct-v0.3"
 MODEL_ID = "microsoft/Phi-3-mini-4k-instruct"
 
 # Hugging Face token (must be in .env as HF_TOKEN=hf_xxx)
@@ -21,4 +21,4 @@ if HF_TOKEN is None:
 DB_PATH = "data/orders.db"
 
 # Optional: default max new tokens for generation
-MAX_NEW_TOKENS = 256
+MAX_NEW_TOKENS = 96
