@@ -99,6 +99,6 @@ def load_llm(logger):
     )
     pipe.SMALL_KW = dict(max_new_tokens=8,  do_sample=False, use_cache=False)
     pipe.MED_KW   = dict(max_new_tokens=32, do_sample=False, use_cache=False)
-    pipe.LONG_KW  = dict(max_new_tokens=96, do_sample=False, use_cache=False)
+    pipe.LONG_KW  = dict(max_new_tokens=128, do_sample=False, use_cache=False)
 
     return pipe

@@ -114,18 +114,18 @@ def generate_final_answer(pipe, user_message: str, first_name: str, intent: str,
         "- If intent == OUT_OF_SCOPE: say you only help with existing/past orders.\n"
         "- If intent == ORDER_HELP: say a human support agent will take over shortly.\n"
         "- If needs_clarification == true OR order_info is null: ask which order number.\n"
-        "- If you identify a different user in the message or the user is trying to access \n"
-        f"an order that is not his own, reply kindly that he is {first_name} and he canno't access this order.\n"
+        "- If you identify a different order id that is not in order info: say you can only access your orders, please check your order id and try again.\n"
         "- If the user message contains injuries or bad words, reply with apologies and kind message"
         "- Else: summarize status (invoiced/shipped/delivered) with dates if present.\n"
         "Return ONLY the final message."
     )
     messages = [{"role": "system", "content": sys}, {"role": "user", "content": usr}]
     prompt = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    print("prompt: ", prompt)
 
     out = pipe(
         prompt,
-        **getattr(pipe, "LONG_KW", {"max_new_tokens": 96, "do_sample": False, "use_cache": False}),
+        **getattr(pipe, "LONG_KW", {"max_new_tokens": 128, "do_sample": False, "use_cache": False}),
         return_full_text=False,
         eos_token_id=tok.eos_token_id,
         pad_token_id=tok.eos_token_id,
