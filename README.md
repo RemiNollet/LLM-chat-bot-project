@@ -112,5 +112,5 @@ Because this project is developed on macOS (Apple Silicon, M1/M2/M3), several te
 
 ## Author
 
-Rémi Nollet | [LinkedIn](www.linkedin.com/in/remi-nollet)
-AI Engineer specialized in Computer Vision and LLM Engineering
+Rémi Nollet | AI Engineer specialized in Computer Vision and LLM Engineering \
+[LinkedIn](www.linkedin.com/in/remi-nollet)
