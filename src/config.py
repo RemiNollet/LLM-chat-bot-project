@@ -21,4 +21,4 @@ if HF_TOKEN is None:
 DB_PATH = "data/orders.db"
 
 # Optional: default max new tokens for generation
-MAX_NEW_TOKENS = 96
+MAX_NEW_TOKENS = 128

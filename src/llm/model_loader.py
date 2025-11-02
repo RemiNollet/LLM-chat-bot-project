@@ -1,10 +1,12 @@
 """
-This module is responsible for loading the LLM (Mistral 7B Instruct)
+This module is responsible for loading the LLM
 and returning a text-generation pipeline that other parts of the app can reuse.
 
 We keep this isolated so:
 - We only load the model once.
 - Other modules don't need to worry about tokenizer / config.
+
+=> Uncomment the section you want to use depending of your configuration
 """
 
 import transformers
@@ -13,31 +15,12 @@ from config import MODEL_ID, HF_TOKEN, MAX_NEW_TOKENS
 
 
 def load_llm(logger):
-    """
-    Load the Mistral model in 8-bit precision. + tokenizer as a text-generation pipeline.
-    Returns a Hugging Face transformers pipeline object.
-
-    The pipeline will be reused across classifier / parameter extractor / answer generator.
-    """
 
     print("DEBUG HF_TOKEN present:", HF_TOKEN is not None)
     logger.info("Dont forget to install database following instructions in src/db/connection.py !!")
     logger.info("Dont forget to create .env file with your HF_TOKEN !!")
 
-    if torch.backends.mps.is_available():
-        # On Apple Silicon, MPS = Metal Performance Shaders (Apple GPU backend)
-        Device_map = "mps"
-        dtype = torch.bfloat16  # bfloat16 works better than float16 on MPS
-    else:
-        Device_map = "cpu"
-        dtype = torch.float32   # safe default on CPU
-
-    # Load model configuration
-    model_config = transformers.AutoConfig.from_pretrained(
-        MODEL_ID,
-        token=HF_TOKEN
-    )
-
+    """ ################# Cloud config: #################
     bnb_config = transformers.BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type='nf4',
@@ -52,16 +35,46 @@ def load_llm(logger):
         use_fast=False
     )
 
+    model = transformers.AutoModelForCausalLM.from_pretrained(
+        MODEL_ID,
+        trust_remote_code=True,   # allows custom code from model repo (needed for some instruct models)
+        config=model_config,
+        device_map="auto",        # automatically put layers on GPU if available
+        quantization_config=bnb_config,
+        token=HF_TOKEN
+    )
+    ###################################################
+    """ 
+
+    ################# MAC LOCAL CONFIG: #################
+    if torch.backends.mps.is_available():
+        # On Apple Silicon, MPS = Metal Performance Shaders (Apple GPU backend)
+        Device_map = "mps"
+        dtype = torch.bfloat16  # bfloat16 works better than float16 on MPS
+    else:
+        Device_map = "cpu"
+        dtype = torch.float32   # safe default on CPU
+
+    # Load model configuration
+    model_config = transformers.AutoConfig.from_pretrained(
+        MODEL_ID,
+        token=HF_TOKEN
+    )
+
+    # Load tokenizer
+    tokenizer = transformers.AutoTokenizer.from_pretrained(
+        MODEL_ID,
+        token=HF_TOKEN,
+        use_fast=False
+    )
+
     # Load model weights
     model = transformers.AutoModelForCausalLM.from_pretrained(
         MODEL_ID,
         trust_remote_code=True,   # allows custom code from model repo (needed for some instruct models)
         config=model_config,
-        #device_map="auto",        # automatically put layers on GPU if available
-        #load_in_8bit=True, 
         device_map=Device_map,     # "mps" on Apple GPU, otherwise "cpu"
         dtype=dtype,   # lowers memory usage a bit on MPS
-        #quantization_config=bnb_config,
         token=HF_TOKEN
     )
 
@@ -72,7 +85,7 @@ def load_llm(logger):
     except Exception:
         pass
     model.eval()
-
+    ###################################################
 
     # Build the generation pipeline
     pipe = transformers.pipeline(
