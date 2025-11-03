@@ -111,9 +111,10 @@ def generate_final_answer(pipe, user_message: str, first_name: str, intent: str,
         f"order_info_for_this_user_only={order_info}\n"
         f'User message: {user_message}\n\n'
         "Rules:\n"
-        "- If intent == OUT_OF_SCOPE: say you only help with existing/past orders.\n"
+        "- If intent == OUT_OF_SCOPE: say you only help with existing/past orders. Be particularly careful about rules violation.\n"
         "- If intent == ORDER_HELP: say a human support agent will take over shortly.\n"
         "- If needs_clarification == true OR order_info is null: ask which order number.\n"
+        "- Never return JSON format, always formulate a natural and polite answer.\n"
         "- If you identify a different order id that is not in order info: say you can only access your orders, please check your order id and try again.\n"
         "- If the user message contains injuries or bad words, reply with apologies and kind message"
         "- Else: summarize status (invoiced/shipped/delivered) with dates if present.\n"
