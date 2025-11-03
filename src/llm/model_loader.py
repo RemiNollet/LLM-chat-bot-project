@@ -20,29 +20,38 @@ def load_llm(logger):
     logger.info("Dont forget to install database following instructions in src/db/connection.py !!")
     logger.info("Dont forget to create .env file with your HF_TOKEN !!")
 
-    """ ################# Cloud config: #################
+    """ ################# Cloud GPU config: #################
     bnb_config = transformers.BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type='nf4',
+        load_in_4bit=True,                 # or set to False and use load_in_8bit=True
+        bnb_4bit_quant_type="nf4",
         bnb_4bit_use_double_quant=True,
-        bnb_4bit_compute_dtype=torch.bfloat16
+        bnb_4bit_compute_dtype=torch.float16,  # float16 on CUDA is fine
     )
 
-    # Load tokenizer
-    tokenizer = transformers.AutoTokenizer.from_pretrained(
-        MODEL_ID,
-        token=HF_TOKEN,
-        use_fast=False
-    )
+    cfg = transformers.AutoConfig.from_pretrained(MODEL_ID, token=HF_TOKEN)
+    tok = transformers.AutoTokenizer.from_pretrained(MODEL_ID, token=HF_TOKEN, use_fast=False)
 
     model = transformers.AutoModelForCausalLM.from_pretrained(
         MODEL_ID,
-        trust_remote_code=True,   # allows custom code from model repo (needed for some instruct models)
-        config=model_config,
-        device_map="auto",        # automatically put layers on GPU if available
-        quantization_config=bnb_config,
-        token=HF_TOKEN
+        token=HF_TOKEN,
+        trust_remote_code=True,
+        config=cfg,
+        device_map="auto",
+        quantization_config=bnb_config,    # <-- modern API; do NOT mix with load_in_8bit kw
     )
+    model.eval()
+
+    gen = transformers.pipeline(
+        "text-generation",
+        model=model,
+        tokenizer=tok,
+        max_new_tokens=min(MAX_NEW_TOKENS, 128),
+        do_sample=False,
+        return_full_text=False,
+        pad_token_id=tok.eos_token_id,
+        eos_token_id=tok.eos_token_id,
+    )
+    return gen
     ###################################################
     """ 
 
@@ -85,7 +94,6 @@ def load_llm(logger):
     except Exception:
         pass
     model.eval()
-    ###################################################
 
     # Build the generation pipeline
     pipe = transformers.pipeline(
@@ -102,3 +110,4 @@ def load_llm(logger):
     pipe.LONG_KW  = dict(max_new_tokens=128, do_sample=False, use_cache=False)
 
     return pipe
+    ###################################################
