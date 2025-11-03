@@ -91,13 +91,13 @@ def handle_user_message(user_message: str) -> str:
     intent = classify_intent(pipe, clean_message)
     logger.info(f"Detected intent: {intent}")
 
-    # Handle OUT_OF_SCOPE early
-    if intent == "OUT_OF_SCOPE":
-        logger.info("Intent OUT_OF_SCOPE → returning polite default answer.")
-        return (
-            "I can help you with information about your existing or past orders "
-            "(status, delivery, shipping, etc.). How can I help you today?"
-        )
+    # # Handle OUT_OF_SCOPE early
+    # if intent == "OUT_OF_SCOPE":
+    #     logger.info("Intent OUT_OF_SCOPE → returning polite default answer.")
+    #     return (
+    #         "I can help you with information about your existing or past orders "
+    #         "(status, delivery, shipping, etc.). How can I help you today?"
+    #     )
 
     # Handle ORDER_HELP early
     if intent == "ORDER_HELP":
