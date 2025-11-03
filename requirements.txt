@@ -2,7 +2,8 @@ transformers==4.57.1
 pandas==2.3.3
 Streamlit==1.50.0
 dotenv==0.9.9
-torch==2.9.0          # needed for Mistral model inference
+torch==2.5.1          # needed for Mistral model inference
 accelerate==1.11.0     # device_map="auto" relies on accelerate
-bitsandbytes==0.42.0
+bitsandbytes>=0.44.0
 sentencepiece==0.2.1
+huggingface_hub>=0.24.6
