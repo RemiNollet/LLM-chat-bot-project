@@ -38,6 +38,11 @@ When a user sends a message, the system goes through three key LLM-based reasoni
    - **Safe** (no data leaks between users)
 
 ---
+# Architecture
+
+![Architecture Diagram](docs/architecture.png)
+
+---
 
 ## Technical Details
 
@@ -70,6 +75,29 @@ curl -O https://blent-learning-user-ressources.s3.eu-west-3.amazonaws.com/projec
 # Run application
 streamlit run src/app.py
 ```
+
+## Tests
+
+A test suite is included to validate the core logic of the system.
+
+Tests cover:
+- LLM pipeline
+   - Intent classification
+   - Parameter extraction
+   - Final answer generation (mocked LLM)
+- Security layer
+   - Order ownership verification
+   - Input sanitization (if implemented)
+- Database interactions
+   - Order retrieval consistency
+   - SQL safety checks
+
+To run:
+```bash
+pytest
+```
+
+---
 
 ## Constraints & Security
 

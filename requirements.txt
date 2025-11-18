@@ -7,3 +7,4 @@ accelerate==1.11.0     # device_map="auto" relies on accelerate
 bitsandbytes>=0.44.0
 sentencepiece==0.2.1
 huggingface_hub>=0.24.6
+pytest==9.0.1
